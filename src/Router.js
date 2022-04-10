@@ -13,6 +13,8 @@ const Router = () => {
                         <Route element={<Home />} index />
                         <Route path="/schedule" element={<Schedule />} />
                         <Route path="/query" element={<Query />} />
+
+                        <Route path="*" element={<h1>not found!</h1>} />
                     </Route>
                 </Routes>
             </BrowserRouter>

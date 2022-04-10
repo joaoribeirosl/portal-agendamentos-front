@@ -1,5 +1,5 @@
 import React from "react";
-import {GitPullRequest} from "tabler-icons-react";
+import { Calendar, Home, InfoCircle } from "tabler-icons-react";
 import { ThemeIcon, UnstyledButton, Group, Text } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
@@ -39,19 +39,19 @@ function MainLink({ icon, color, label, path }) {
 
 const routes = [
     {
-        icon: <GitPullRequest size={16} />,
+        icon: <Home size={16} />,
         color: "blue",
         label: "Home",
         path: "/",
     },
     {
-        icon: <GitPullRequest size={16} />,
+        icon: <Calendar size={16} />,
         color: "blue",
         label: "Schedule",
         path: "/schedule",
     },
     {
-        icon: <GitPullRequest size={16} />,
+        icon: <InfoCircle size={16} />,
         color: "blue",
         label: "Query",
         path: "/query",
