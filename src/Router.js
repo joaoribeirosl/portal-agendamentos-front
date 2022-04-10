@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Home from "./pages/Home"
 import Schedule from "./pages/Schedule"
 import Query from "./pages/Query"
-import Layout from "./Components/Layoult"
+import Layout from "./components/Layoult"
 
 const Router = () => {
     return (

@@ -1,24 +1,27 @@
 import { Table, Button } from "@mantine/core"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Pencil, Trash } from 'tabler-icons-react';
+import axios from "../../services/api.js";
+
+
 
 
 const Schedule = () => {
 
-    const [schedules, setSchedule] = useState([
-        {
-            id: 1,
-            name: "jo",
-            email: "aaa@a.br",
-            password: "dsadas",
-            birthDate: "",
-            schedulingDate: ""
-        },
-    ])
+    const [schedules, setSchedules] = useState([])
+
+    useEffect(() => {
+
+        axios
+            .get("/schedules")
+            .then((response) => setSchedules(response.data.items))
+            .catch((error) => console.error(error))
+    }, [])
 
     return (
         <div>
-            <h2>Schedule</h2>
+            {console.log(schedules)}
+            <h2>Schedule: </h2>
             <Table mt={10} horizontalSpacing="md" verticalSpacing="xs" highlightOnHover>
                 <thead>
                     <tr>
@@ -33,8 +36,8 @@ const Schedule = () => {
                 </thead>
                 <tbody>
                     {schedules.map((schedule, index) => (
-                        < tr key={index} >
-                            <td>{schedule.id}</td>
+                        <tr key={index}>
+                            <td>{schedule._id}</td>
                             <td>{schedule.name}</td>
                             <td>{schedule.email}</td>
                             <td>{schedule.password}</td>
