@@ -1,13 +1,16 @@
-import { Table, Button } from "@mantine/core"
+import { Table, Button, Text } from "@mantine/core"
 import { showNotification } from '@mantine/notifications';
+import { useModals } from '@mantine/modals';
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { Pencil, Trash } from 'tabler-icons-react';
 import axios from "../../services/api.js";
 
+
 const Schedule = () => {
     const navigate = useNavigate()
     const [schedules, setSchedules] = useState([])
+    const modals = useModals();
 
     useEffect(() => {
         axios
@@ -65,6 +68,18 @@ const Schedule = () => {
         }
     }
 
+    const openConfirmModal = (id) => modals.openConfirmModal({
+        title: 'Please confirm your action',
+        children: (
+            <Text size="sm">
+                Are you sure you want to remove this schedule?
+            </Text>
+        ),
+        labels: { confirm: 'Confirm', cancel: 'Cancel' },
+        onCancel: () => { },
+        onConfirm: () => onRemoveSchedule(id),
+    });
+
     return (
         <div>
             <h2>Schedule: </h2>
@@ -103,7 +118,7 @@ const Schedule = () => {
                                     ml={10}
                                     variant="gradient"
                                     gradient={{ from: 'orange', to: 'red' }}
-                                    onClick={() => onRemoveSchedule(schedule._id)}>remove schedule</Button>
+                                    onClick={() => openConfirmModal(schedule._id)}>remove schedule</Button>
                             </td>
                         </tr>
                     ))}

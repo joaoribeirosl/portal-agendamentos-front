@@ -1,9 +1,13 @@
 import { useState, useEffect, useCallback } from "react"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 import { useNavigate, useParams } from "react-router-dom"
-import { InputWrapper, Input, Button, PasswordInput} from "@mantine/core";
+import { InputWrapper, Input, Button, PasswordInput } from "@mantine/core";
 import { EyeCheck, EyeOff } from 'tabler-icons-react';
 import { showNotification } from '@mantine/notifications';
 import axios from "../../services/api.js"
+
+
 
 const Schedule = () => {
 
@@ -17,9 +21,17 @@ const Schedule = () => {
         name: "",
         email: "",
         password: "",
-        birthDate: "",
-        scheduleDate: "",
+        birthDate: new Date(),
+        schedulingDate: new Date(),
     })
+
+    const getBirthDate = (date) => {
+        form.birthDate = date
+    }
+
+    const getScheduleDate = (date) => {
+        form.schedulingDate = date
+    }
 
     useEffect(() => {
         if (!isNewSchedule) {
@@ -54,13 +66,13 @@ const Schedule = () => {
         })
     }
 
-    const onSubmit = useCallback( async () => {
-        try{
-            if(isNewSchedule){
+    const onSubmit = useCallback(async () => {
+        try {
+            if (isNewSchedule) {
                 await axios.post("/schedules", form)
             }
-            else{
-                await axios.put(`/schedules/${scheduleId}`,form)
+            else {
+                await axios.put(`/schedules/${scheduleId}`, form)
             }
 
             showNotification(
@@ -81,10 +93,12 @@ const Schedule = () => {
                 })
 
             navigate("/schedule")
-        }catch(error){
+        } catch (error) {
             alert(error.message)
         }
-    },[form,isNewSchedule,navigate,scheduleId])
+    }, [form, isNewSchedule, navigate, scheduleId])
+
+    const [, setStartDate] = useState(new Date());
 
     return (
         <div>
@@ -118,16 +132,27 @@ const Schedule = () => {
                 }
             />
 
-            {/* react-date-picker para tratar dos campos birthDate e scheduleDate */}
+            {/* react-datepicker para tratar dos campos birthDate e scheduleDate */}
 
+            <label>birthdate</label>
+            <DatePicker
+                isClearable
+                name={form.birthDate}
+                selected={form.birthDate ? Date.parse(form.birthDate) : new Date()}
+                onChange={(date) => { setStartDate(date); getBirthDate(date) }} />
+            
+
+            <label>schedule date</label>
+            <DatePicker
+                isClearable
+                name={form.schedulingDate}
+                selected={form.schedulingDate ? Date.parse(form.schedulingDate) : new Date()}
+                onChange={(date) => { setStartDate(date); getScheduleDate(date) }} />
+            
             <Button mt={10} variant="gradient" gradient={{ from: 'teal', to: 'blue', deg: 60 }} onClick={onSubmit}>{pageTitle}</Button>
 
         </div>
     )
-
-
-
-
 
 }
 
