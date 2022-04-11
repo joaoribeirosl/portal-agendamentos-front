@@ -2,10 +2,11 @@ import { useState, useEffect, useCallback } from "react"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { useNavigate, useParams } from "react-router-dom"
-import { InputWrapper, Input, Button, PasswordInput } from "@mantine/core";
+import { InputWrapper, Input, Button, PasswordInput, Grid } from "@mantine/core";
 import { EyeCheck, EyeOff } from 'tabler-icons-react';
 import { showNotification } from '@mantine/notifications';
 import axios from "../../services/api.js"
+// import { Formik } from "formik";
 
 
 
@@ -23,6 +24,7 @@ const Schedule = () => {
         password: "",
         birthDate: new Date(),
         schedulingDate: new Date(),
+        schedulingTime: new Date(),
     })
 
     const getBirthDate = (date) => {
@@ -32,6 +34,12 @@ const Schedule = () => {
     const getScheduleDate = (date) => {
         form.schedulingDate = date
     }
+
+    const getTime = (date) => {
+        form.schedulingTime = date
+    }
+
+
 
     useEffect(() => {
         if (!isNewSchedule) {
@@ -108,7 +116,8 @@ const Schedule = () => {
                     id="name"
                     name="name"
                     value={form.name}
-                    onChange={onChange} />
+                    onChange={onChange}
+                />
             </InputWrapper>
 
             <InputWrapper mb={10} id="email" required label="email" size="md">
@@ -116,7 +125,8 @@ const Schedule = () => {
                     id="email"
                     name="email"
                     value={form.email}
-                    onChange={onChange} />
+                    onChange={onChange}
+                />
             </InputWrapper>
 
             <PasswordInput
@@ -131,25 +141,47 @@ const Schedule = () => {
                     reveal ? <EyeOff size={size} /> : <EyeCheck size={size} />
                 }
             />
+            <Grid>
+                <Grid.Col lg={2} >
+                    <InputWrapper mb={20} label="birth date">
+                        <DatePicker
+                            dateFormat={"dd/MM/yyyy"}
+                            withPortal
+                            name={form.birthDate}
+                            selected={form.birthDate ? Date.parse(form.birthDate) : new Date()}
+                            onChange={(date) => { setStartDate(date); getBirthDate(date) }}
+                        />
+                    </InputWrapper>
+                </Grid.Col>
 
-            {/* react-datepicker para tratar dos campos birthDate e scheduleDate */}
+                <Grid.Col lg={2}>
+                    <InputWrapper mb={20} label="schedule date">
+                        <DatePicker
+                        dateFormat={"dd/MM/yyyy"}
+                            withPortal
+                            name={form.schedulingDate}
+                            selected={form.schedulingDate ? Date.parse(form.schedulingDate) : new Date()}
+                            onChange={(date) => { setStartDate(date); getScheduleDate(date) }}
+                        />
+                    </InputWrapper>
+                </Grid.Col>
 
-            <label>birthdate</label>
-            <DatePicker
-                isClearable
-                name={form.birthDate}
-                selected={form.birthDate ? Date.parse(form.birthDate) : new Date()}
-                onChange={(date) => { setStartDate(date); getBirthDate(date) }} />
-            
-
-            <label>schedule date</label>
-            <DatePicker
-                isClearable
-                name={form.schedulingDate}
-                selected={form.schedulingDate ? Date.parse(form.schedulingDate) : new Date()}
-                onChange={(date) => { setStartDate(date); getScheduleDate(date) }} />
-            
-            <Button mt={10} variant="gradient" gradient={{ from: 'teal', to: 'blue', deg: 60 }} onClick={onSubmit}>{pageTitle}</Button>
+                <Grid.Col lg={2}>
+                    <InputWrapper label="schedule time">
+                        <DatePicker
+                            showTimeSelect
+                            showTimeSelectOnly
+                            timeIntervals={60}
+                            dateFormat="hh:mm"
+                            withPortal
+                            name={form.schedulingTime}
+                            selected={form.schedulingTime ? Date.parse(form.schedulingTime) : new Date()}
+                            onChange={(date) => { setStartDate(date); getTime(date) }}
+                        />
+                    </InputWrapper>
+                </Grid.Col>
+            </Grid>
+            <Button mt={50} variant="gradient" gradient={{ from: 'teal', to: 'blue', deg: 60 }} onClick={onSubmit}>{pageTitle}</Button>
 
         </div>
     )

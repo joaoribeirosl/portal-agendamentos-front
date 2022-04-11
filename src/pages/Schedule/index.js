@@ -96,6 +96,7 @@ const Schedule = () => {
                         <th>password</th>
                         <th>birthDate</th>
                         <th>schedulingDate</th>
+                        <th>schedulingTime</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -108,6 +109,7 @@ const Schedule = () => {
                             <td>{schedule.password}</td>
                             <td>{schedule.birthDate}</td>
                             <td>{schedule.schedulingDate}</td>
+                            <td>{schedule.schedulingTime}</td>
                             <td>
                                 <Button leftIcon={<Pencil />}
                                     variant="gradient"

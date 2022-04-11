@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar, Home, InfoCircle } from "tabler-icons-react";
+import { Calendar, Home } from "tabler-icons-react";
 import { ThemeIcon, UnstyledButton, Group, Text } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
@@ -49,12 +49,6 @@ const routes = [
         color: "blue",
         label: "Schedule",
         path: "/schedule",
-    },
-    {
-        icon: <InfoCircle size={16} />,
-        color: "blue",
-        label: "Query",
-        path: "/query",
     },
 ]
 
