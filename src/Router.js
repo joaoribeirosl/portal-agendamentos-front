@@ -3,7 +3,7 @@ import Home from "./pages/Home"
 import Schedules from "./pages/Schedule"
 import Schedule from "./pages/Schedule/Schedule"
 import Query from "./pages/Query"
-import Layout from "./components/Layoult"
+import Layout from "./components/Layout"
 
 const Router = () => {
     return (
