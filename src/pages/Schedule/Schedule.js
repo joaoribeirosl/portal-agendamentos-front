@@ -2,12 +2,12 @@ import { useState, useEffect, useCallback } from "react"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { useNavigate, useParams } from "react-router-dom"
-import { InputWrapper, Input, Button, PasswordInput, Grid } from "@mantine/core";
+import { InputWrapper, Input, Button, PasswordInput, Grid, Select } from "@mantine/core";
 import { EyeCheck, EyeOff } from 'tabler-icons-react';
 import { showNotification } from '@mantine/notifications';
 import axios from "../../services/api.js"
-// import { Formik } from "formik";
-
+// import { Form, Formik, Field } from "formik";
+// import * as yup from "yup"
 
 
 const Schedule = () => {
@@ -25,6 +25,7 @@ const Schedule = () => {
         birthDate: new Date(),
         schedulingDate: new Date(),
         schedulingTime: new Date(),
+        status: "",
     })
 
     const getBirthDate = (date) => {
@@ -39,6 +40,13 @@ const Schedule = () => {
         form.schedulingTime = date
     }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const validateForm = useCallback(() => {
+        if (!(form.name && form.password && form.status)) {
+            return true
+        }
+        return false
+    })
 
 
     useEffect(() => {
@@ -74,43 +82,50 @@ const Schedule = () => {
         })
     }
 
+
     const onSubmit = useCallback(async () => {
-        try {
-            if (isNewSchedule) {
-                await axios.post("/schedules", form)
-            }
-            else {
-                await axios.put(`/schedules/${scheduleId}`, form)
-            }
+        if (validateForm) {
 
-            showNotification(
-                {
-                    message: `Schedule ${isNewSchedule ? "created" : "updated"}`,
-                    autoClose: true,
-                    styles: (theme) => ({
-                        root: {
-                            backgroundColor: theme.colors.cyan[4],
-                            borderColor: theme.colors.cyan[4],
-                            '&:hover': { backgroundColor: theme.colors.cyan[5] },
-                        },
-                        closeButton: {
-                            color: theme.white,
-                            '&:hover': { backgroundColor: theme.colors.blue[4] },
-                        },
+            try {
+                if (isNewSchedule) {
+                    await axios.post("/schedules", form)
+                }
+                else {
+                    await axios.put(`/schedules/${scheduleId}`, form)
+                }
+
+                showNotification(
+                    {
+                        message: `Schedule ${isNewSchedule ? "created" : "updated"}`,
+                        autoClose: true,
+                        styles: (theme) => ({
+                            root: {
+                                backgroundColor: theme.colors.cyan[4],
+                                borderColor: theme.colors.cyan[4],
+                                '&:hover': { backgroundColor: theme.colors.cyan[5] },
+                            },
+                            closeButton: {
+                                color: theme.white,
+                                '&:hover': { backgroundColor: theme.colors.blue[4] },
+                            },
+                        })
                     })
-                })
 
-            navigate("/schedule")
-        } catch (error) {
-            alert(error.message)
+                navigate("/schedule")
+            } catch (error) {
+                alert(error.message)
+            }
+
         }
-    }, [form, isNewSchedule, navigate, scheduleId])
+
+    }, [form, isNewSchedule, navigate, scheduleId, validateForm])
 
     const [, setStartDate] = useState(new Date());
 
     return (
         <div>
             <h2>{pageTitle}</h2>
+
             <InputWrapper id="name" required label="name" size="md">
                 <Input
                     id="name"
@@ -118,15 +133,17 @@ const Schedule = () => {
                     value={form.name}
                     onChange={onChange}
                 />
+
             </InputWrapper>
 
-            <InputWrapper mb={10} id="email" required label="email" size="md">
+            <InputWrapper mb={10} id="email" label="email" size="md">
                 <Input
                     id="email"
                     name="email"
                     value={form.email}
                     onChange={onChange}
                 />
+
             </InputWrapper>
 
             <PasswordInput
@@ -141,10 +158,14 @@ const Schedule = () => {
                     reveal ? <EyeOff size={size} /> : <EyeCheck size={size} />
                 }
             />
+
+
+
             <Grid>
                 <Grid.Col lg={2} >
                     <InputWrapper mb={20} label="birth date">
                         <DatePicker
+                            minDate={new Date()}
                             dateFormat={"dd/MM/yyyy"}
                             withPortal
                             name={form.birthDate}
@@ -157,12 +178,14 @@ const Schedule = () => {
                 <Grid.Col lg={2}>
                     <InputWrapper mb={20} label="schedule date">
                         <DatePicker
-                        dateFormat={"dd/MM/yyyy"}
+                            minDate={new Date()}
+                            dateFormat={"dd/MM/yyyy"}
                             withPortal
                             name={form.schedulingDate}
                             selected={form.schedulingDate ? Date.parse(form.schedulingDate) : new Date()}
                             onChange={(date) => { setStartDate(date); getScheduleDate(date) }}
                         />
+
                     </InputWrapper>
                 </Grid.Col>
 
@@ -178,10 +201,30 @@ const Schedule = () => {
                             selected={form.schedulingTime ? Date.parse(form.schedulingTime) : new Date()}
                             onChange={(date) => { setStartDate(date); getTime(date) }}
                         />
+
                     </InputWrapper>
                 </Grid.Col>
             </Grid>
-            <Button mt={50} variant="gradient" gradient={{ from: 'teal', to: 'blue', deg: 60 }} onClick={onSubmit}>{pageTitle}</Button>
+
+            <Select
+                required
+                label="was served?"
+                placeholder="pick one"
+                name={form.status}
+                onChange={(value) => onChange({ target: { name: "status", value } })}
+                data={[
+                    { value: "SERVED", label: "served" },
+                    { value: "NOT_SERVED", label: "not served" },
+                ]}
+            />
+
+            <Button
+                disabled={validateForm()}
+                mt={50}
+                variant="gradient"
+                gradient={{ from: 'teal', to: 'blue', deg: 60 }}
+                onClick={onSubmit}>{pageTitle}
+            </Button>
 
         </div>
     )

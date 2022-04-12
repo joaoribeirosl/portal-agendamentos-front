@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { Pencil, Trash } from 'tabler-icons-react';
 import axios from "../../services/api.js";
+import moment from "moment";
 
 
 const Schedule = () => {
@@ -97,6 +98,7 @@ const Schedule = () => {
                         <th>birthDate</th>
                         <th>schedulingDate</th>
                         <th>schedulingTime</th>
+                        <th>status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -107,9 +109,10 @@ const Schedule = () => {
                             <td>{schedule.name}</td>
                             <td>{schedule.email}</td>
                             <td>{schedule.password}</td>
-                            <td>{schedule.birthDate}</td>
-                            <td>{schedule.schedulingDate}</td>
-                            <td>{schedule.schedulingTime}</td>
+                            <td>{moment(schedule.birthDate).format("DD/MM/YYYY")}</td>
+                            <td>{moment(schedule.schedulingDate).format("DD/MM/YYYY")}</td>
+                            <td>{moment(schedule.schedulingTime).format("hh:mm")}</td>
+                            <td>{schedule.status}</td>
                             <td>
                                 <Button leftIcon={<Pencil />}
                                     variant="gradient"
@@ -122,7 +125,7 @@ const Schedule = () => {
                                     gradient={{ from: 'orange', to: 'red' }}
                                     onClick={() => openConfirmModal(schedule._id)}>remove schedule</Button>
                             </td>
-                        </tr>
+                        </tr>   
                     ))}
                 </tbody>
             </Table>
