@@ -2,12 +2,12 @@ import { useState, useEffect, useCallback } from "react"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { useNavigate, useParams } from "react-router-dom"
-import { InputWrapper, Input, Button, PasswordInput, Grid, Select } from "@mantine/core";
-import { EyeCheck, EyeOff } from 'tabler-icons-react';
+import { InputWrapper, Input, Button, Grid, Select, PasswordInput } from "@mantine/core";
 import { showNotification } from '@mantine/notifications';
+import { EyeCheck, EyeOff } from 'tabler-icons-react';
 import axios from "../../services/api.js"
-// import { Form, Formik, Field } from "formik";
-// import * as yup from "yup"
+import { Form, Formik } from "formik";
+import * as yup from "yup"
 
 
 const Schedule = () => {
@@ -18,15 +18,41 @@ const Schedule = () => {
     const isNewSchedule = scheduleId === "new"
     const pageTitle = isNewSchedule ? "Create Schedule" : "Edit Schedule"
 
+
+    const validate = yup.object({
+        name: yup
+            .string()
+            .required("No name provided")
+            .matches(/^[a-zA-Z ]+$/, "invalid name! please, try again")
+            .max(50),
+        password: yup
+            .string()
+            .required("No password provided")
+            .min(8, "Password is too short - should be 8 chars minimum")
+            .matches(/[a-zA-Z]/, "Password can only contain Latin letters"),
+        birthDate: yup
+            .string()
+            .required("No birth date provided"),
+        schedulingDate: yup
+            .string()
+            .required("No scheduling date provided"),
+        schedulingTime: yup
+            .string()
+            .required("No scheduling time provided"),
+
+    })
+
+
+
     const [form, setForm] = useState({
         name: "",
-        email: "",
         password: "",
         birthDate: new Date(),
         schedulingDate: new Date(),
         schedulingTime: new Date(),
         status: "",
     })
+
 
     const getBirthDate = (date) => {
         form.birthDate = date
@@ -42,7 +68,7 @@ const Schedule = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const validateForm = useCallback(() => {
-        if (!(form.name && form.password && form.status)) {
+        if (!(form.name === "" && form.password === "")) {
             return true
         }
         return false
@@ -85,7 +111,6 @@ const Schedule = () => {
 
     const onSubmit = useCallback(async () => {
         if (validateForm) {
-
             try {
                 if (isNewSchedule) {
                     await axios.post("/schedules", form)
@@ -116,8 +141,8 @@ const Schedule = () => {
                 alert(error.message)
             }
 
-        }
 
+        }
     }, [form, isNewSchedule, navigate, scheduleId, validateForm])
 
     const [, setStartDate] = useState(new Date());
@@ -126,107 +151,130 @@ const Schedule = () => {
         <div>
             <h2>{pageTitle}</h2>
 
-            <InputWrapper id="name" required label="name" size="md">
-                <Input
-                    id="name"
-                    name="name"
-                    value={form.name}
-                    onChange={onChange}
-                />
+            <Formik
+                initialValues={form}
+                enableReinitialize={true}
+                validationSchema={validate}
+            >
 
-            </InputWrapper>
+                {({ handleBlur, errors }) => {
 
-            <InputWrapper mb={10} id="email" label="email" size="md">
-                <Input
-                    id="email"
-                    name="email"
-                    value={form.email}
-                    onChange={onChange}
-                />
+                    return (
+                        <Form>
 
-            </InputWrapper>
+                            <InputWrapper id="name" required label="name" size="md">
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    value={form.name}
+                                    onChange={onChange}
+                                    onBlur={handleBlur}
+                                />
+                                {errors.name && (
+                                    <div style={{ color: "red" }}>{errors.name}</div>
+                                )}
 
-            <PasswordInput
-                mb={10}
-                name="password"
-                label="password"
-                value={form.password}
-                required
-                placeholder="Change visibility toggle icon"
-                onChange={onChange}
-                visibilityToggleIcon={({ reveal, size }) =>
-                    reveal ? <EyeOff size={size} /> : <EyeCheck size={size} />
-                }
-            />
+                            </InputWrapper>
 
+                            <PasswordInput
+                                mb={10}
+                                name="password"
+                                label="password"
+                                value={form.password}
+                                required
+                                placeholder="Change visibility toggle icon"
+                                onChange={onChange}
+                                onBlur={handleBlur}
+                                visibilityToggleIcon={({ reveal, size }) =>
+                                    reveal ? <EyeOff size={size} /> : <EyeCheck size={size} />
+                                }
+                            />
+                            {errors.password && (
+                                <div style={{ color: "red" }}>{errors.password}</div>
+                            )}
 
+                            <Grid>
+                                <Grid.Col lg={2} >
+                                    <InputWrapper mb={20} label="birth date">
+                                        <DatePicker
+                                            maxDate={new Date()}
+                                            dateFormat={"dd/MM/yyyy"}
+                                            withPortal
+                                            name={form.birthDate}
+                                            selected={form.birthDate ? Date.parse(form.birthDate) : new Date()}
+                                            onChange={(date) => { setStartDate(date); getBirthDate(date) }}
+                                        />
 
-            <Grid>
-                <Grid.Col lg={2} >
-                    <InputWrapper mb={20} label="birth date">
-                        <DatePicker
-                            minDate={new Date()}
-                            dateFormat={"dd/MM/yyyy"}
-                            withPortal
-                            name={form.birthDate}
-                            selected={form.birthDate ? Date.parse(form.birthDate) : new Date()}
-                            onChange={(date) => { setStartDate(date); getBirthDate(date) }}
-                        />
-                    </InputWrapper>
-                </Grid.Col>
+                                        {errors.birthDate && (
+                                            <div style={{ color: "red" }}>{errors.birthDate}</div>
+                                        )}
+                                    </InputWrapper>
+                                </Grid.Col>
 
-                <Grid.Col lg={2}>
-                    <InputWrapper mb={20} label="schedule date">
-                        <DatePicker
-                            minDate={new Date()}
-                            dateFormat={"dd/MM/yyyy"}
-                            withPortal
-                            name={form.schedulingDate}
-                            selected={form.schedulingDate ? Date.parse(form.schedulingDate) : new Date()}
-                            onChange={(date) => { setStartDate(date); getScheduleDate(date) }}
-                        />
+                                <Grid.Col lg={2}>
+                                    <InputWrapper mb={20} label="schedule date">
+                                        <DatePicker
+                                            minDate={new Date()}
+                                            dateFormat={"dd/MM/yyyy"}
+                                            withPortal
+                                            name={form.schedulingDate}
+                                            selected={form.schedulingDate ? Date.parse(form.schedulingDate) : new Date()}
+                                            onChange={(date) => { setStartDate(date); getScheduleDate(date) }}
+                                        />
+                                        {errors.schedulingDate && (
+                                            <div style={{ color: "red" }}>{errors.schedulingDate}</div>
+                                        )}
+                                    </InputWrapper>
+                                </Grid.Col>
 
-                    </InputWrapper>
-                </Grid.Col>
+                                <Grid.Col lg={2}>
+                                    <InputWrapper label="schedule time">
+                                        <DatePicker
+                                            showTimeSelect
+                                            showTimeSelectOnly
+                                            timeIntervals={60}
+                                            dateFormat="hh:mm"
+                                            withPortal
+                                            name={form.schedulingTime}
+                                            selected={form.schedulingTime ? Date.parse(form.schedulingTime) : new Date()}
+                                            onChange={(date) => { setStartDate(date); getTime(date) }}
+                                        />
+                                        {errors.schedulingTime && (
+                                            <div style={{ color: "red" }}>{errors.schedulingTime}</div>
+                                        )}
 
-                <Grid.Col lg={2}>
-                    <InputWrapper label="schedule time">
-                        <DatePicker
-                            showTimeSelect
-                            showTimeSelectOnly
-                            timeIntervals={60}
-                            dateFormat="hh:mm"
-                            withPortal
-                            name={form.schedulingTime}
-                            selected={form.schedulingTime ? Date.parse(form.schedulingTime) : new Date()}
-                            onChange={(date) => { setStartDate(date); getTime(date) }}
-                        />
+                                    </InputWrapper>
+                                </Grid.Col>
+                            </Grid>
 
-                    </InputWrapper>
-                </Grid.Col>
-            </Grid>
+                            <Select
+                                required
+                                label="was served?"
+                                placeholder="pick one"
+                                name={form.status}
+                                onChange={(value) => onChange({ target: { name: "status", value } })}
+                                data={[
+                                    { value: "SERVED", label: "served" },
+                                    { value: "NOT_SERVED", label: "not served" },
+                                ]}
+                            />
 
-            <Select
-                required
-                label="was served?"
-                placeholder="pick one"
-                name={form.status}
-                onChange={(value) => onChange({ target: { name: "status", value } })}
-                data={[
-                    { value: "SERVED", label: "served" },
-                    { value: "NOT_SERVED", label: "not served" },
-                ]}
-            />
+                            <Button
+                                mt={50}
+                                variant="gradient"
+                                gradient={{ from: 'teal', to: 'blue', deg: 60 }}
+                                onClick={onSubmit}
+                            >
+                                {pageTitle}
+                            </Button>
 
-            <Button
-                disabled={validateForm()}
-                mt={50}
-                variant="gradient"
-                gradient={{ from: 'teal', to: 'blue', deg: 60 }}
-                onClick={onSubmit}>{pageTitle}
-            </Button>
-
+                        </Form>
+                    )
+                }}
+            </Formik >
         </div>
+
+
     )
 
 }

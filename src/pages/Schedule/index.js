@@ -93,7 +93,6 @@ const Schedule = () => {
                     <tr>
                         <th>id</th>
                         <th>name</th>
-                        <th>email</th>
                         <th>password</th>
                         <th>birthDate</th>
                         <th>schedulingDate</th>
@@ -107,7 +106,6 @@ const Schedule = () => {
                         <tr key={index}>
                             <td>{schedule._id}</td>
                             <td>{schedule.name}</td>
-                            <td>{schedule.email}</td>
                             <td>{schedule.password}</td>
                             <td>{moment(schedule.birthDate).format("DD/MM/YYYY")}</td>
                             <td>{moment(schedule.schedulingDate).format("DD/MM/YYYY")}</td>
