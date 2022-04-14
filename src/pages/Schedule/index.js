@@ -20,10 +20,6 @@ const Schedule = () => {
             .catch((error) => console.error(error))
     }, [])
 
-    const onCreateSchedule = () => {
-        navigate("new")
-    }
-
     const onRemoveSchedule = async (id) => {
 
         try {
@@ -77,17 +73,14 @@ const Schedule = () => {
             </Text>
         ),
         labels: { confirm: 'Confirm', cancel: 'Cancel' },
-        onCancel: () => { },
+        onCancel: () => {},
         onConfirm: () => onRemoveSchedule(id),
     });
 
     return (
         <div>
-            <h2>Schedule: </h2>
-            <Button
-                variant="gradient"
-                gradient={{ from: 'teal', to: 'lime', deg: 105 }}
-                onClick={onCreateSchedule}>Create Schedule</Button>
+            <h2>Schedules: </h2>
+
             <Table mt={10} horizontalSpacing="md" verticalSpacing="xs" highlightOnHover>
                 <thead>
                     <tr>
@@ -109,7 +102,7 @@ const Schedule = () => {
                             <td>{schedule.password}</td>
                             <td>{moment(schedule.birthDate).format("DD/MM/YYYY")}</td>
                             <td>{moment(schedule.schedulingDate).format("DD/MM/YYYY")}</td>
-                            <td>{moment(schedule.schedulingTime).format("hh:mm")}</td>
+                            <td>{moment(schedule.schedulingTime).format("hh:mm A")}</td>
                             <td>{schedule.status}</td>
                             <td>
                                 <Button leftIcon={<Pencil />}
@@ -123,7 +116,7 @@ const Schedule = () => {
                                     gradient={{ from: 'orange', to: 'red' }}
                                     onClick={() => openConfirmModal(schedule._id)}>remove schedule</Button>
                             </td>
-                        </tr>   
+                        </tr>
                     ))}
                 </tbody>
             </Table>

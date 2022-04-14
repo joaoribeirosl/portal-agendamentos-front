@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
-import DatePicker from "react-datepicker"
+import DatePicker, { registerLocale } from "react-datepicker"
+import setHours from "date-fns/setHours";
+import setMinutes from "date-fns/setMinutes";
 import "react-datepicker/dist/react-datepicker.css"
 import { useNavigate, useParams } from "react-router-dom"
 import { InputWrapper, Input, Button, Grid, Select, PasswordInput } from "@mantine/core";
@@ -8,23 +10,25 @@ import { EyeCheck, EyeOff } from 'tabler-icons-react';
 import axios from "../../services/api.js"
 import { Form, Formik } from "formik";
 import * as yup from "yup"
-
+import moment from "moment";
+import br from 'date-fns/locale/pt-BR'
+registerLocale("br", br)
+moment.locale("pt-BR")
 
 const Schedule = () => {
 
-    const { scheduleId } = useParams()
+    const { scheduleId } = useParams()   // scheduleDateId, scheduleTimeId
     const navigate = useNavigate()
-
     const isNewSchedule = scheduleId === "new"
     const pageTitle = isNewSchedule ? "Create Schedule" : "Edit Schedule"
-
 
     const validate = yup.object({
         name: yup
             .string()
             .required("No name provided")
-            .matches(/^[a-zA-Z ]+$/, "invalid name! please, try again")
-            .max(50),
+            .min(3, "Name is too short - should be 3 chars minimum")
+            .max(50, "Name is too long - should be 50 chars maximum")
+            .matches(/^[a-zA-Z ]+$/, "invalid name! please, try again"),
         password: yup
             .string()
             .required("No password provided")
@@ -42,17 +46,14 @@ const Schedule = () => {
 
     })
 
-
-
     const [form, setForm] = useState({
         name: "",
         password: "",
-        birthDate: new Date(),
-        schedulingDate: new Date(),
-        schedulingTime: new Date(),
+        birthDate: "",
+        schedulingDate: "",
+        schedulingTime: "",
         status: "",
     })
-
 
     const getBirthDate = (date) => {
         form.birthDate = date
@@ -66,13 +67,16 @@ const Schedule = () => {
         form.schedulingTime = date
     }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const validateForm = useCallback(() => {
-        if (!(form.name === "" && form.password === "")) {
-            return true
+    const validateForm = (form) => {
+        if (
+            form.name !== "" && form.password !== "" &&
+            form.birthDate !== "" && form.schedulingDate !== "" &&
+            form.schedulingTime !== "" && form.status !== ""
+        ) {
+            return true;
         }
-        return false
-    })
+        return false;
+    };
 
 
     useEffect(() => {
@@ -108,42 +112,49 @@ const Schedule = () => {
         })
     }
 
-
     const onSubmit = useCallback(async () => {
-        if (validateForm) {
-            try {
-                if (isNewSchedule) {
-                    await axios.post("/schedules", form)
-                }
-                else {
-                    await axios.put(`/schedules/${scheduleId}`, form)
-                }
+        try {
+            // const datePath = await axios.get(`/schedules/date/${scheduleDateId}/${scheduleTimeId}`) 
+            
+            if (isNewSchedule) {
 
-                showNotification(
-                    {
-                        message: `Schedule ${isNewSchedule ? "created" : "updated"}`,
-                        autoClose: true,
-                        styles: (theme) => ({
-                            root: {
-                                backgroundColor: theme.colors.cyan[4],
-                                borderColor: theme.colors.cyan[4],
-                                '&:hover': { backgroundColor: theme.colors.cyan[5] },
-                            },
-                            closeButton: {
-                                color: theme.white,
-                                '&:hover': { backgroundColor: theme.colors.blue[4] },
-                            },
-                        })
-                    })
+                let newDate = new Date(form.schedulingDate)
+                newDate.setHours(0, 0, 0, 0)
+                form.schedulingDate = newDate.toISOString()
 
-                navigate("/schedule")
-            } catch (error) {
-                alert(error.message)
+                let newTime = new Date(form.schedulingTime)
+                newTime.setSeconds(0, 0)
+                form.schedulingTime = newTime.toISOString()
+
+
+                await axios.post("/schedules", form)
             }
+            else {
+                await axios.put(`/schedules/${scheduleId}`, form)
+            }
+            showNotification(
+                {
+                    message: `Schedule ${isNewSchedule ? "created" : "updated"}`,
+                    autoClose: true,
+                    styles: (theme) => ({
+                        root: {
+                            backgroundColor: theme.colors.cyan[4],
+                            borderColor: theme.colors.cyan[4],
+                            '&:hover': { backgroundColor: theme.colors.cyan[5] },
+                        },
+                        closeButton: {
+                            color: theme.white,
+                            '&:hover': { backgroundColor: theme.colors.blue[4] },
+                        },
+                    })
+                })
 
-
+            navigate("/schedule")
+        } catch (error) {
+            alert(error.message)
         }
-    }, [form, isNewSchedule, navigate, scheduleId, validateForm])
+
+    }, [form, isNewSchedule, navigate, scheduleId])  //,scheduleDateId,scheduleTimeId
 
     const [, setStartDate] = useState(new Date());
 
@@ -156,12 +167,9 @@ const Schedule = () => {
                 enableReinitialize={true}
                 validationSchema={validate}
             >
-
                 {({ handleBlur, errors }) => {
-
                     return (
                         <Form>
-
                             <InputWrapper id="name" required label="name" size="md">
                                 <Input
                                     id="name"
@@ -195,12 +203,12 @@ const Schedule = () => {
 
                             <Grid>
                                 <Grid.Col lg={2} >
-                                    <InputWrapper mb={20} label="birth date">
+                                    <InputWrapper required id="birthDate" mb={20} label="birth date">
                                         <DatePicker
                                             maxDate={new Date()}
                                             dateFormat={"dd/MM/yyyy"}
                                             withPortal
-                                            name={form.birthDate}
+                                            value={form.birthDate}
                                             selected={form.birthDate ? Date.parse(form.birthDate) : new Date()}
                                             onChange={(date) => { setStartDate(date); getBirthDate(date) }}
                                         />
@@ -212,12 +220,12 @@ const Schedule = () => {
                                 </Grid.Col>
 
                                 <Grid.Col lg={2}>
-                                    <InputWrapper mb={20} label="schedule date">
+                                    <InputWrapper id="schedulingDate" required mb={20} label="schedule date">
                                         <DatePicker
                                             minDate={new Date()}
                                             dateFormat={"dd/MM/yyyy"}
                                             withPortal
-                                            name={form.schedulingDate}
+                                            value={form.schedulingDate}
                                             selected={form.schedulingDate ? Date.parse(form.schedulingDate) : new Date()}
                                             onChange={(date) => { setStartDate(date); getScheduleDate(date) }}
                                         />
@@ -228,16 +236,20 @@ const Schedule = () => {
                                 </Grid.Col>
 
                                 <Grid.Col lg={2}>
-                                    <InputWrapper label="schedule time">
+                                    <InputWrapper id="schedulingTime" required label="schedule time" >
                                         <DatePicker
+                                            id="schedulingTime"
                                             showTimeSelect
+                                            minTime={setHours(setMinutes(new Date(), 0),6)}
+                                            maxTime={setHours(setMinutes(new Date(), 0),18)}
                                             showTimeSelectOnly
                                             timeIntervals={60}
-                                            dateFormat="hh:mm"
+                                            dateFormat="hh:mm a"
                                             withPortal
-                                            name={form.schedulingTime}
+                                            value={form.schedulingTime}
                                             selected={form.schedulingTime ? Date.parse(form.schedulingTime) : new Date()}
                                             onChange={(date) => { setStartDate(date); getTime(date) }}
+                                            locale={br}
                                         />
                                         {errors.schedulingTime && (
                                             <div style={{ color: "red" }}>{errors.schedulingTime}</div>
@@ -264,19 +276,16 @@ const Schedule = () => {
                                 variant="gradient"
                                 gradient={{ from: 'teal', to: 'blue', deg: 60 }}
                                 onClick={onSubmit}
+                                disabled={!validateForm(form)}
                             >
                                 {pageTitle}
                             </Button>
-
                         </Form>
                     )
                 }}
             </Formik >
         </div>
-
-
     )
-
 }
 
 export default Schedule
