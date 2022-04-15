@@ -17,7 +17,7 @@ moment.locale("pt-BR")
 
 const Schedule = () => {
 
-    const { scheduleId } = useParams()   // scheduleDateId, scheduleTimeId
+    const { scheduleId } = useParams()
     const navigate = useNavigate()
     const isNewSchedule = scheduleId === "new"
     const pageTitle = isNewSchedule ? "Create Schedule" : "Edit Schedule"
@@ -73,11 +73,10 @@ const Schedule = () => {
             form.birthDate !== "" && form.schedulingDate !== "" &&
             form.schedulingTime !== "" && form.status !== ""
         ) {
-            return true;
+            return true
         }
-        return false;
-    };
-
+        return false
+    }
 
     useEffect(() => {
         if (!isNewSchedule) {
@@ -113,50 +112,97 @@ const Schedule = () => {
     }
 
     const onSubmit = useCallback(async () => {
-        try {
-            // const datePath = await axios.get(`/schedules/date/${scheduleDateId}/${scheduleTimeId}`) 
-            
-            if (isNewSchedule) {
 
-                let newDate = new Date(form.schedulingDate)
-                newDate.setHours(0, 0, 0, 0)
-                form.schedulingDate = newDate.toISOString()
+        let newDate = new Date(form.schedulingDate)
+        newDate.setHours(0, 0, 0, 0)
+        form.schedulingDate = newDate.toISOString()
 
-                let newTime = new Date(form.schedulingTime)
-                newTime.setSeconds(0, 0)
-                form.schedulingTime = newTime.toISOString()
+        let newTime = new Date(form.schedulingTime)
+        newTime.setSeconds(0, 0)
+        form.schedulingTime = newTime.toISOString()
 
 
-                await axios.post("/schedules", form)
-            }
-            else {
-                await axios.put(`/schedules/${scheduleId}`, form)
-            }
+        const timePath = await axios.get(`/schedules/date/${newDate}/${newTime}`)
+        const time = timePath.data.item
+
+        if (time >= 2) {
             showNotification(
                 {
-                    message: `Schedule ${isNewSchedule ? "created" : "updated"}`,
+                    message: "You cannot create more than 2 entries for the same time !",
                     autoClose: true,
                     styles: (theme) => ({
                         root: {
-                            backgroundColor: theme.colors.cyan[4],
-                            borderColor: theme.colors.cyan[4],
-                            '&:hover': { backgroundColor: theme.colors.cyan[5] },
+                            backgroundColor: theme.colors.red[4],
+                            borderColor: theme.colors.red[4],
+                            '&:hover': { backgroundColor: theme.colors.red[5] },
                         },
                         closeButton: {
                             color: theme.white,
-                            '&:hover': { backgroundColor: theme.colors.blue[4] },
+                            '&:hover': { backgroundColor: theme.colors.gray[6] },
                         },
                     })
-                })
-
-            navigate("/schedule")
-        } catch (error) {
-            alert(error.message)
+                }
+            )
         }
+        else {
+            const datePath = await axios.get(`/schedules/date/${newDate}`)
+            const date = datePath.data.item
 
-    }, [form, isNewSchedule, navigate, scheduleId])  //,scheduleDateId,scheduleTimeId
+            if (date >= 2) {
+                showNotification(
+                    {
+                        message: "You cannot create more than 20 entries for the same date !",
+                        autoClose: true,
+                        styles: (theme) => ({
+                            root: {
+                                backgroundColor: theme.colors.red[4],
+                                borderColor: theme.colors.red[4],
+                                '&:hover': { backgroundColor: theme.colors.red[5] },
+                            },
+                            closeButton: {
+                                color: theme.white,
+                                '&:hover': { backgroundColor: theme.colors.gray[6] },
+                            },
+                        })
+                    }
+                )
+            }
+            else {
 
-    const [, setStartDate] = useState(new Date());
+                try {
+
+                    if (isNewSchedule) {
+                        await axios.post("/schedules", form)
+                    }
+                    else {
+                        await axios.put(`/schedules/${scheduleId}`, form)
+                    }
+                    showNotification(
+                        {
+                            message: `Schedule ${isNewSchedule ? "created" : "updated"}`,
+                            autoClose: true,
+                            styles: (theme) => ({
+                                root: {
+                                    backgroundColor: theme.colors.cyan[4],
+                                    borderColor: theme.colors.cyan[4],
+                                    '&:hover': { backgroundColor: theme.colors.cyan[5] },
+                                },
+                                closeButton: {
+                                    color: theme.white,
+                                    '&:hover': { backgroundColor: theme.colors.blue[4] },
+                                },
+                            })
+                        })
+
+                    navigate("/schedule")
+                } catch (error) {
+                    alert(error.message)
+                }
+            }
+        }
+    }, [form, isNewSchedule, navigate, scheduleId])
+
+    const [, setStartDate] = useState(new Date())
 
     return (
         <div>
@@ -240,8 +286,8 @@ const Schedule = () => {
                                         <DatePicker
                                             id="schedulingTime"
                                             showTimeSelect
-                                            minTime={setHours(setMinutes(new Date(), 0),6)}
-                                            maxTime={setHours(setMinutes(new Date(), 0),18)}
+                                            minTime={setHours(setMinutes(new Date(), 0), 6)}
+                                            maxTime={setHours(setMinutes(new Date(), 0), 18)}
                                             showTimeSelectOnly
                                             timeIntervals={60}
                                             dateFormat="hh:mm a"
