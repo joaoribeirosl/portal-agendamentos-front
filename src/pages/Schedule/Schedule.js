@@ -148,7 +148,7 @@ const Schedule = () => {
             const datePath = await axios.get(`/schedules/date/${newDate}`)
             const date = datePath.data.item
 
-            if (date >= 2) {
+            if (date >= 20) {
                 showNotification(
                     {
                         message: "You cannot create more than 20 entries for the same date !",

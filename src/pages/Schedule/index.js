@@ -73,54 +73,69 @@ const Schedule = () => {
             </Text>
         ),
         labels: { confirm: 'Confirm', cancel: 'Cancel' },
-        onCancel: () => {},
+        onCancel: () => { },
         onConfirm: () => onRemoveSchedule(id),
     });
+
+
+
+    const sortSchedules = () => {
+        schedules.sort((a, b) => {
+            return new Date(a.schedulingDate) - new Date(b.schedulingDate) ||
+                new Date(a.schedulingTime) - new Date(b.schedulingTime)
+        })
+    }
+
+
 
     return (
         <div>
             <h2>Schedules: </h2>
 
-            <Table mt={10} horizontalSpacing="md" verticalSpacing="xs" highlightOnHover>
-                <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>name</th>
-                        <th>password</th>
-                        <th>birthDate</th>
-                        <th>schedulingDate</th>
-                        <th>schedulingTime</th>
-                        <th>status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {schedules.map((schedule, index) => (
-                        <tr key={index}>
-                            <td>{schedule._id}</td>
-                            <td>{schedule.name}</td>
-                            <td>{schedule.password}</td>
-                            <td>{moment(schedule.birthDate).format("DD/MM/YYYY")}</td>
-                            <td>{moment(schedule.schedulingDate).format("DD/MM/YYYY")}</td>
-                            <td>{moment(schedule.schedulingTime).format("hh:mm A")}</td>
-                            <td>{schedule.status}</td>
-                            <td>
-                                <Button leftIcon={<Pencil />}
-                                    variant="gradient"
-                                    gradient={{ from: '#ed6ea0', to: '#ec8c69', deg: 35 }}
-                                    onClick={() => navigate(schedule._id)}>edit schedule</Button>
-
-                                <Button leftIcon={<Trash />}
-                                    ml={10}
-                                    variant="gradient"
-                                    gradient={{ from: 'orange', to: 'red' }}
-                                    onClick={() => openConfirmModal(schedule._id)}>remove schedule</Button>
-                            </td>
+            <>
+                {sortSchedules()}
+                <Table mt={10} horizontalSpacing="md" verticalSpacing="xs" highlightOnHover>
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>name</th>
+                            <th>password</th>
+                            <th>birthDate</th>
+                            <th>schedulingDate</th>
+                            <th>schedulingTime</th>
+                            <th>status</th>
+                            <th>Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </Table>
+                    </thead>
+                    <tbody>
+                        {schedules.map((schedule, index) => (
+                            <tr key={index}>
+                                <td>{schedule._id}</td>
+                                <td>{schedule.name}</td>
+                                <td>{schedule.password}</td>
+                                <td>{moment(schedule.birthDate).format("DD/MM/YYYY")}</td>
+                                <td>{moment(schedule.schedulingDate).format("DD/MM/YYYY")}</td>
+                                <td>{moment(schedule.schedulingTime).format("hh:mm A")}</td>
+                                <td>{schedule.status}</td>
+                                <td>
+                                    <Button leftIcon={<Pencil />}
+                                        variant="gradient"
+                                        gradient={{ from: '#ed6ea0', to: '#ec8c69', deg: 35 }}
+                                        onClick={() => navigate(schedule._id)}>edit schedule</Button>
+
+                                    <Button leftIcon={<Trash />}
+                                        ml={10}
+                                        variant="gradient"
+                                        gradient={{ from: 'orange', to: 'red' }}
+                                        onClick={() => openConfirmModal(schedule._id)}>remove schedule</Button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </Table>
+            </>
         </div >
+
     )
 }
 
