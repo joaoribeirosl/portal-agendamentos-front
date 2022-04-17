@@ -46,13 +46,14 @@ const Schedule = () => {
 
     })
 
+
     const [form, setForm] = useState({
         name: "",
         password: "",
         birthDate: "",
         schedulingDate: "",
         schedulingTime: "",
-        status: "",
+        status: "NOT_SERVED",
     })
 
     const getBirthDate = (date) => {
@@ -67,11 +68,14 @@ const Schedule = () => {
         form.schedulingTime = date
     }
 
-    const validateForm = (form) => {
+    const validateForm = form => {
         if (
-            form.name !== "" && form.password !== "" &&
-            form.birthDate !== "" && form.schedulingDate !== "" &&
-            form.schedulingTime !== "" && form.status !== ""
+            (form.name !== "" && form.name.length >= 3) && 
+            (form.password !== "" && form.password.length >= 8) &&
+            form.birthDate !== "" && 
+            form.schedulingDate !== "" &&
+            form.schedulingTime !== "" && 
+            form.status !== ""
         ) {
             return true
         }
@@ -207,15 +211,16 @@ const Schedule = () => {
     return (
         <div>
             <h2>{pageTitle}</h2>
-
+            
             <Formik
                 initialValues={form}
-                enableReinitialize={true}
+                enableReinitialize
                 validationSchema={validate}
             >
-                {({ handleBlur, errors }) => {
+                {({ handleBlur, errors, touched, values}) => {
                     return (
                         <Form>
+                            {/* {console.log(values.name.length)} */}
                             <InputWrapper id="name" required label="name" size="md">
                                 <Input
                                     id="name"
@@ -224,9 +229,9 @@ const Schedule = () => {
                                     onChange={onChange}
                                     onBlur={handleBlur}
                                 />
-                                {errors.name && (
+                                {errors.name && touched.name ? (
                                     <div style={{ color: "red" }}>{errors.name}</div>
-                                )}
+                                ) : null}
 
                             </InputWrapper>
 
@@ -243,9 +248,9 @@ const Schedule = () => {
                                     reveal ? <EyeOff size={size} /> : <EyeCheck size={size} />
                                 }
                             />
-                            {errors.password && (
+                            {errors.password && touched.password ? (
                                 <div style={{ color: "red" }}>{errors.password}</div>
-                            )}
+                            ) : null}
 
                             <Grid>
                                 <Grid.Col lg={2} >
@@ -309,7 +314,8 @@ const Schedule = () => {
                                 required
                                 label="was served?"
                                 placeholder="pick one"
-                                name={form.status}
+                                value={form.status}
+                                defaultValue="NOT_SERVED"
                                 onChange={(value) => onChange({ target: { name: "status", value } })}
                                 data={[
                                     { value: "SERVED", label: "served" },
@@ -322,7 +328,7 @@ const Schedule = () => {
                                 variant="gradient"
                                 gradient={{ from: 'teal', to: 'blue', deg: 60 }}
                                 onClick={onSubmit}
-                                disabled={!validateForm(form)}
+                                disabled={!validateForm(values)}
                             >
                                 {pageTitle}
                             </Button>
