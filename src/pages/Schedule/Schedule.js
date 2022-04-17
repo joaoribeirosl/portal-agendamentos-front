@@ -220,7 +220,6 @@ const Schedule = () => {
                 {({ handleBlur, errors, touched, values}) => {
                     return (
                         <Form>
-                            {/* {console.log(values.name.length)} */}
                             <InputWrapper id="name" required label="name" size="md">
                                 <Input
                                     id="name"
