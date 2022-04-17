@@ -6,20 +6,30 @@ import { Button } from "@mantine/core"
 const Home = () => {
     const navigate = useNavigate()
 
+    const onCreateSchedule = () => {
+        navigate("schedule/new")
+    }
+
     return (
         <div>
             <h2>Home:</h2>
 
-            <Button 
+            <Button
                 variant="gradient"
-                gradient={{ from: '#ed6ea0', to: '#ec8c69', deg: 35 }}
-                onClick={() => navigate("schedule/new")}> appointment </Button>
+                gradient={{ from: 'teal', to: 'lime', deg: 105 }}
+                onClick={onCreateSchedule}
+            >
+                Create Schedule
+            </Button>
 
-            <Button 
+            <Button
                 ml={10}
                 variant="gradient"
-                gradient={{ from: 'orange', to: 'red' }}
-                onClick={() => navigate("schedule")}> query </Button>
+                gradient={{ from: 'teal', to: 'blue', deg: 60 }}
+                onClick={() => navigate("schedule")}
+            >
+                Query list
+            </Button>
 
 
         </div>
