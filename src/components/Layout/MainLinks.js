@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar, Home } from "tabler-icons-react";
+import { Home } from "tabler-icons-react";
 import { ThemeIcon, UnstyledButton, Group, Text } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
@@ -8,7 +8,7 @@ function MainLink({ icon, color, label, path }) {
 
     return (
         <UnstyledButton
-            onClick={() => navigate(path)} //
+            onClick={() => navigate(path)} 
             sx={(theme) => ({
                 display: "block",
                 width: "100%",
@@ -43,12 +43,6 @@ const routes = [
         color: "blue",
         label: "Home",
         path: "/",
-    },
-    {
-        icon: <Calendar size={16} />,
-        color: "blue",
-        label: "Schedule",
-        path: "/schedule",
     },
 ]
 

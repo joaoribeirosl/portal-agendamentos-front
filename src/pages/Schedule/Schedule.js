@@ -27,7 +27,6 @@ const Schedule = () => {
             .string()
             .required("No name provided")
             .min(3, "Name is too short - should be 3 chars minimum")
-            .max(50, "Name is too long - should be 50 chars maximum")
             .matches(/^[a-zA-Z ]+$/, "invalid name! please, try again"),
         password: yup
             .string()
@@ -70,12 +69,11 @@ const Schedule = () => {
 
     const validateForm = form => {
         if (
-            (form.name !== "" && form.name.length >= 3) && 
+            (form.name !== "" && form.name.length >= 3) &&
             (form.password !== "" && form.password.length >= 8) &&
-            form.birthDate !== "" && 
+            form.birthDate !== "" &&
             form.schedulingDate !== "" &&
-            form.schedulingTime !== "" && 
-            form.status !== ""
+            form.schedulingTime !== ""
         ) {
             return true
         }
@@ -124,7 +122,6 @@ const Schedule = () => {
         let newTime = new Date(form.schedulingTime)
         newTime.setSeconds(0, 0)
         form.schedulingTime = newTime.toISOString()
-
 
         const timePath = await axios.get(`/schedules/date/${newDate}/${newTime}`)
         const time = timePath.data.item
@@ -211,16 +208,16 @@ const Schedule = () => {
     return (
         <div>
             <h2>{pageTitle}</h2>
-            
+
             <Formik
                 initialValues={form}
                 enableReinitialize
                 validationSchema={validate}
             >
-                {({ handleBlur, errors, touched, values}) => {
+                {({ handleBlur, errors, touched, values }) => {
                     return (
                         <Form>
-                            <InputWrapper id="name" required label="name" size="md">
+                            <InputWrapper id="name" required label="name" size="md" >
                                 <Input
                                     id="name"
                                     name="name"
@@ -309,8 +306,9 @@ const Schedule = () => {
                                 </Grid.Col>
                             </Grid>
 
+
                             <Select
-                                required
+                                disabled={isNewSchedule}
                                 label="was served?"
                                 placeholder="pick one"
                                 value={form.status}

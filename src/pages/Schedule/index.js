@@ -7,7 +7,6 @@ import { Pencil, Trash } from 'tabler-icons-react';
 import axios from "../../services/api.js";
 import moment from "moment";
 
-
 const Schedule = () => {
     const navigate = useNavigate()
     const [schedules, setSchedules] = useState([])
@@ -77,8 +76,6 @@ const Schedule = () => {
         onConfirm: () => onRemoveSchedule(id),
     });
 
-
-
     const sortSchedules = () => {
         schedules.sort((a, b) => {
             return new Date(a.schedulingDate) - new Date(b.schedulingDate) ||
@@ -120,13 +117,13 @@ const Schedule = () => {
                                 <td>
                                     <Button leftIcon={<Pencil />}
                                         variant="gradient"
-                                        gradient={{ from: '#ed6ea0', to: '#ec8c69', deg: 35 }}
+                                        gradient={{ from: '#ff4e50', to: '#f9d423', deg: 35 }}
                                         onClick={() => navigate(schedule._id)}>edit schedule</Button>
 
                                     <Button leftIcon={<Trash />}
                                         ml={10}
                                         variant="gradient"
-                                        gradient={{ from: 'orange', to: 'red' }}
+                                        gradient={{ from: '#e53935', to: '#e35d5b', deg: 35 }}
                                         onClick={() => openConfirmModal(schedule._id)}>remove schedule</Button>
                                 </td>
                             </tr>

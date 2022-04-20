@@ -28,7 +28,7 @@ const Home = () => {
                 gradient={{ from: 'teal', to: 'blue', deg: 60 }}
                 onClick={() => navigate("schedule")}
             >
-                Query list
+                Schedule list
             </Button>
 
 
