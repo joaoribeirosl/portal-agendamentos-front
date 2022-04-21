@@ -87,7 +87,7 @@ const Schedule = () => {
 
     return (
         <div>
-            <h2>Schedules: </h2>
+            <h2>Schedules: {schedules.length} </h2>
 
             <>
                 {sortSchedules()}

@@ -124,7 +124,11 @@ const Schedule = () => {
         form.schedulingTime = newTime.toISOString()
 
         const timePath = await axios.get(`/schedules/date/${newDate}/${newTime}`)
-        const time = timePath.data.item
+        let time = timePath.data.item
+
+        if (!isNewSchedule) {
+            time = time - 1;
+        }
 
         if (time >= 2) {
             showNotification(
@@ -147,7 +151,11 @@ const Schedule = () => {
         }
         else {
             const datePath = await axios.get(`/schedules/date/${newDate}`)
-            const date = datePath.data.item
+            let date = datePath.data.item
+
+            if (!isNewSchedule) {
+                date = date - 1;
+            }
 
             if (date >= 20) {
                 showNotification(
